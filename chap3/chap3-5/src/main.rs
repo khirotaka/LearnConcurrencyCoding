@@ -1,7 +1,7 @@
 use std::sync::{Arc, Mutex};
 use std::thread;
 
-fn some_func(lock: Arc<Mutex<u64>>) {
+fn func1(lock: Arc<Mutex<u64>>) {
     /*loop {
         let mut val = lock.lock().unwrap();
         *val += 1;
@@ -19,7 +19,7 @@ fn main() {
     let lock1 = lock0.clone();
 
     let th0 = thread::spawn(move || {
-        some_func(lock0)
+        func1(lock0)
     });
 
     let th1 = thread::spawn(move || {
