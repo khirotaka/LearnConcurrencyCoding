@@ -10,7 +10,15 @@ fn func1(lock: Arc<Mutex<u64>>) {
     for _ in 0..10 {
         let mut val = lock.lock().unwrap();
         *val += 1;
-        println!("{}", val);
+        println!("func1: {}", val);
+    }
+}
+
+fn func2(lock: Arc<Mutex<u64>>) {
+    for _ in 11..20 {
+        let mut val = lock.lock().unwrap();
+        *val += 2;
+        println!("func2 :{}", val);
     }
 }
 
@@ -23,7 +31,7 @@ fn main() {
     });
 
     let th1 = thread::spawn(move || {
-        some_func(lock1)
+        func2(lock1)
     });
 
     th0.join().unwrap();
