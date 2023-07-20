@@ -1,25 +1,38 @@
 use std::sync::{Arc, Mutex};
 use std::thread;
+use std::time;
 
 fn func1(lock: Arc<Mutex<u64>>) {
-    /*loop {
+    loop {
         let mut val = lock.lock().unwrap();
         *val += 1;
-        println!("{}", val);
-    }*/
+        println!("func1: {}", val);
+        let ten_mil = time::Duration::from_millis(10);
+        thread::sleep(ten_mil);
+    }
+    /*
     for _ in 0..10 {
         let mut val = lock.lock().unwrap();
         *val += 1;
         println!("func1: {}", val);
-    }
+    }*/
 }
 
 fn func2(lock: Arc<Mutex<u64>>) {
+    loop {
+        let mut val = lock.lock().unwrap();
+        *val += 2;
+        println!("func2 :{}", val);
+        let ten_mil = time::Duration::from_millis(10);
+        thread::sleep(ten_mil);
+    }
+    /*
     for _ in 11..20 {
         let mut val = lock.lock().unwrap();
         *val += 2;
         println!("func2 :{}", val);
     }
+     */
 }
 
 fn main() {
