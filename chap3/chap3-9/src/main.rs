@@ -1,6 +1,8 @@
+mod channel;
 mod semaphore;
-// セマフォ
+// セマフォ & チャンネル
 
+use channel::channel;
 use semaphore::Semaphore;
 use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::Arc;
@@ -12,7 +14,7 @@ const SEM_NUM: isize = 4;
 // usize型をアトミック(スレッドセーフ) に扱うための型
 static mut CNT: AtomicUsize = AtomicUsize::new(0);
 
-fn main() {
+fn semaphore_test() {
     let mut v = Vec::new();
     let sem = Arc::new(Semaphore::new(SEM_NUM));
 
@@ -53,7 +55,7 @@ fn main() {
                     // CNTをアトミックにデクリメント
                     CNT.fetch_sub(1, Ordering::SeqCst)
                 };
-                s.post();   // ロック解放
+                s.post(); // ロック解放
             }
         });
         v.push(t);
@@ -62,4 +64,43 @@ fn main() {
     for t in v {
         t.join().unwrap();
     }
+}
+
+fn channel_test() {
+    let (tx, rx) = channel(4);
+    let mut v = Vec::new();
+
+    // 受信用スレッド
+    let t = std::thread::spawn(move || {
+        let mut cnt = 0;
+        while cnt < NUM_THREADS * NUM_LOOP {
+            let n = rx.recv();
+            println!("recv: n = {:?}", n);
+            cnt += 1;
+        }
+    });
+    v.push(t);
+
+    // 送信用スレッド
+    for i in 0..NUM_THREADS {
+        let tx0 = tx.clone();
+        let t = std::thread::spawn(move || {
+            for j in 0..NUM_LOOP {
+                tx0.send((i, j));
+            }
+        });
+        v.push(t);
+    }
+
+    for t in v {
+        t.join().unwrap();
+    }
+}
+
+fn main() {
+    println!("== Semaphore ==");
+    semaphore_test();
+
+    println!("== Channel ==");
+    channel_test();
 }
