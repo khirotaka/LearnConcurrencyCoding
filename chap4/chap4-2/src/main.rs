@@ -11,6 +11,7 @@ fn main() {
     let t = thread::spawn(move || {
         // Readロックは、複数のReadロックは許可する
         let flag = val.read().unwrap(); // Readロックを獲得
+        // flagのデータ型は RwLockReadGuard<bool>
         // val = trueなら
         if *flag {
             // Writeロックは排他的なので、ロック獲得中はReadもWriteも許されない。
